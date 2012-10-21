@@ -1,0 +1,103 @@
+<?php
+/**
+* @file
+ * A module to display the categories available
+ */
+
+define('PERMISSION_VIEW_CATEGORY', 'view category');
+define('PERMISSION_EDIT_CATEGORY', 'edit category');
+define('PERMISSION_INSERT_CATEGORY', 'insert category');
+
+/**
+ * Implements hook_permission().
+ */
+function categories_permission() {
+  return array(
+    PERMISSION_VIEW_CATEGORY => array(
+      'title' => t('View the categories'),
+      // Note: We translate the 'Administer blocks' permission string here with
+      // a separate t() call, to make sure it gets the same translation as when
+      // it's in block_permission().
+      'description' => t('Customizing the categories requires the !permission-name permission.', array()),
+    ),
+    PERMISSION_EDIT_CATEGORY => array(
+      'title' => t('Edit the categories'),
+      'description' => t('Editing the categories', array()),
+    ),
+    PERMISSION_INSERT_CATEGORY => array(
+      'title' => t('Insert a categories'),
+      'description' => t('Insert new category', array()),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function categories_menu() {
+  $items = array();
+  $items['categories'] = array(
+    'title' => 'Categories',
+    'description' => 'Visa kategorier',
+    'page callback' => 'categories_callback',
+    'access arguments' => array('access categories'),
+  );
+  $items['edit-category'] = array(
+    'title' => 'Redigera kategori',
+    'description' => 'Redigera kategori',
+    'page callback' => 'edit_category_callback',
+    'access arguments' => array('edit category'),
+  );
+  $items['insert-category'] = array(
+    'title' => 'Lägg till kategori',
+    'description' => 'Lägg till kategori',
+    'page callback' => 'insert_category_callback',
+    'access arguments' => array('insert category'),
+  );
+  return $items;
+}
+
+
+/**
+ * A hook to get the categories available
+ *
+ */
+
+function categories_callback() {
+  $categories = array();
+  $categoryObject = new Category();
+  if (isset($categoryObject)) {
+    $categories['categoriesInfo'] = $categoryObject->get_all_categories_from_DB();
+  }
+  return theme('categories', $categories);
+}
+
+/**
+ *
+ * @param type $catId
+ */
+function edit_category_callback($catId) {
+
+}
+
+/**
+ *
+ * @param type $catId
+ */
+function insert_category_callback($catId) {
+
+}
+
+ /**
+ * View the module theme for the categories
+ * @return  array $items
+ */
+function categories_theme($existing, $type, $theme, $path) {
+  $items['categories'] = array(
+    'render element' => 'categories',
+    'template'       => 'categories',
+    'arguments'      => array('form' => NULL),
+    'path'           => drupal_get_path('module', 'categories'),
+  );
+  return $items;
+}
