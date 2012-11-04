@@ -3,5 +3,3 @@ description = Gets the categories for the site
 version = VERSION
 core = 7.x
 files[] = categories_class.php
-files[] = categories.tpl.php
-files[] = categories.module

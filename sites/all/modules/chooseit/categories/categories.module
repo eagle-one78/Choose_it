@@ -5,7 +5,7 @@
  */
 
 define('PERMISSION_VIEW_CATEGORY', 'view category');
-define('PERMISSION_EDIT_CATEGORY', 'edit category');
+//define('PERMISSION_EDIT_CATEGORY', 'edit category');
 define('PERMISSION_INSERT_CATEGORY', 'insert category');
 
 /**
@@ -15,15 +15,12 @@ function categories_permission() {
   return array(
     PERMISSION_VIEW_CATEGORY => array(
       'title' => t('View the categories'),
-      // Note: We translate the 'Administer blocks' permission string here with
-      // a separate t() call, to make sure it gets the same translation as when
-      // it's in block_permission().
-      'description' => t('Customizing the categories requires the !permission-name permission.', array()),
+      'description' => t('View the categories', array()),
     ),
-    PERMISSION_EDIT_CATEGORY => array(
-      'title' => t('Edit the categories'),
-      'description' => t('Editing the categories', array()),
-    ),
+//    PERMISSION_EDIT_CATEGORY => array(
+//      'title' => t('Edit the categories'),
+//      'description' => t('Editing the categories', array()),
+//    ),
     PERMISSION_INSERT_CATEGORY => array(
       'title' => t('Insert a categories'),
       'description' => t('Insert new category', array()),
@@ -32,31 +29,71 @@ function categories_permission() {
 }
 
 /**
+ *
+ *@return array $blocks
+ */
+function categories_block_info() {
+  $blocks = array();
+  $blocks['insert-categories'] = array(
+    'info' => t('Lägg till kategori'),
+  );
+
+  return $blocks;
+}
+
+function categories_block_configure($delta='') {
+  $form = array();
+
+  switch($delta) {
+    case 'insert-categories' :
+      // Text field form element
+      $form['text_body'] = array(
+        '#type' => 'text_format',
+        '#title' => t('Lägg till kategori'),
+        '#default_value' => variable_get('text_variable', ''),
+      );
+
+      // File selection form element
+      $form['file'] = array(
+        '#name' => 'block_image',
+        '#type' => 'managed_file',
+        '#title' => t('Choose an Image File'),
+        '#description' => t('Select an Image for the custom block.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+        '#default_value' => variable_get('block_image_fid', ''),
+        '#upload_location' => 'public://block_image/',
+        '#upload_validators' => array(
+          'file_validate_extensions' => array('gif png jpg jpeg'),
+        ),
+      );
+      break;
+  }
+  return $form;
+}
+
+/**
  * Implements hook_menu().
  */
 function categories_menu() {
   $items = array();
   $items['categories'] = array(
-    'title' => 'Categories',
-    'description' => 'Visa kategorier',
+    'title' => 'Visa kategorier',
     'page callback' => 'categories_callback',
-    'access arguments' => array('access categories'),
+    'access arguments' => array('PERMISSION_VIEW_CATEGORY'),
   );
-  $items['edit-category'] = array(
-    'title' => 'Redigera kategori',
-    'description' => 'Redigera kategori',
-    'page callback' => 'edit_category_callback',
-    'access arguments' => array('edit category'),
-  );
-  $items['insert-category'] = array(
+//  $items['category/%'] = array(
+//    'title' => 'Redigera kategori',
+//    'description' => 'Redigera kategori',
+//    'page callback' => 'edit_category_callback',
+//    'access arguments' => array('edit category'),
+//  );
+  $items['categories/%'] = array(
     'title' => 'Lägg till kategori',
-    'description' => 'Lägg till kategori',
+    'page arguments' => array(1),
     'page callback' => 'insert_category_callback',
-    'access arguments' => array('insert category'),
+    'access arguments' => array(PERMISSION_INSERT_CATEGORY),
   );
   return $items;
 }
-
 
 /**
  * A hook to get the categories available
@@ -80,12 +117,31 @@ function edit_category_callback($catId) {
 
 }
 
+function insert_category() {
+  if (isset($_POST['insert_category']) &&
+    isset($_POST['category_name']) &&
+    isset($_POST['category_description'])) {
+    $categoryObject = new Category();
+    if (isset($categoryObject)) {
+      $categoryObject->insert_category($_POST);
+    }
+  }
+  else {
+    drupal_set_message(t('Du måste ange namn och beskrivning!'), 'error');
+  }
+}
+
 /**
  *
  * @param type $catId
  */
-function insert_category_callback($catId) {
+function insert_category_callback() {
+  $categoryInsert = array();
+  if (isset($_POST['insert_category'])) {
+    $categoryInsert['insertCategory'] = insert_category();
+  }
 
+  return theme('categories', $categoryInsert);
 }
 
  /**

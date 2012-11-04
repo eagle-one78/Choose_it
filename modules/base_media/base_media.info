@@ -1,0 +1,19 @@
+name = Base Media
+description = Defines default configuration and permissions for media modules
+core = 7.x
+package = Base
+dependencies[] = base_core
+dependencies[] = features
+dependencies[] = file_entity
+dependencies[] = media_internet
+features[features_api][] = api:1
+features[user_permission][] = add media from remote sources
+features[user_permission][] = administer files
+features[user_permission][] = edit file
+
+; Information added by drupal.org packaging script on 2012-09-01
+version = "7.x-1.0-alpha1"
+core = "7.x"
+project = "base_media"
+datestamp = "1346495503"
+

@@ -1,0 +1,10 @@
+name = News
+description = Gets the news for the site
+version = VERSION
+core = 7.x
+files[] = news_class.php
+files[] = news.tpl.php
+files[] = news_insert.tpl.php
+files[] = news_edit.tpl.php
+files[] = news_displayt.tpl.php
+files[] = news.module

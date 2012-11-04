@@ -1,0 +1,105 @@
+<?php
+/**
+* @file
+ * A module to display the categories available
+ */
+
+define('PERMISSION_VIEW_NEWS', 'view news');
+define('PERMISSION_EDIT_NEWS', 'edit news');
+define('PERMISSION_INSERT_NEWS', 'insert news');
+
+/**
+ * Implements hook_permission().
+ */
+function news_permission() {
+  return array(
+    PERMISSION_VIEW_NEWS => array(
+      'title' => t('View the news'),
+      'description' => t('View the news', array()),
+    ),
+    PERMISSION_EDIT_NEWS => array(
+      'title' => t('Edit the news'),
+      'description' => t('Editing the news', array()),
+    ),
+    PERMISSION_INSERT_NEWS => array(
+      'title' => t('Insert a news'),
+      'description' => t('Insert new news', array()),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function news_menu() {
+  $items = array();
+  $items['news'] = array(
+    'title' => 'Visa nyhter',
+    'description' => 'Visa nyheter',
+    'page callback' => 'news_callback',
+    'access arguments' => array('view news'),
+  );
+  $items['news/edit'] = array(
+    'title' => 'Redigera nyhet',
+    'description' => 'Redigera nyhet',
+    'page callback' => 'edit_news_callback',
+    'access arguments' => array('edit news'),
+  );
+  $items['news/insert'] = array(
+    'title' => 'Lägg till nyhet',
+    'description' => 'Lägg till nyhet',
+    'page callback' => 'insert_news_callback',
+    'access arguments' => array('insert news'),
+  );
+  return $items;
+}
+
+
+/**
+ * A hook to get the news available
+ *
+ */
+
+function news_callback() {
+  $news = array();
+  $newsObject = new News();
+  if (isset($newsObject)) {
+    $news['newsInfo'] = $newsObject->get_all_news();
+  }
+  return theme('news', $news);
+}
+
+/**
+ *
+ * @param type $catId
+ */
+function edit_news_callback($newsId) {
+
+}
+
+/**
+ *
+ * @param type $catId
+ */
+function insert_news_callback() {
+  if (isset($_POST['news_title']) && isset($_POST['news_text'])) {
+    $newsObject = new News();
+    $newsObject->insert_news_to_db($_POST['news_title'], $_POST['news_text']);
+  }
+//  drupal_goto($_POST['redirect'].'news/save');
+
+}
+
+ /**
+ * View the module theme for the categories
+ * @return  array $items
+ */
+function news_theme($existing, $type, $theme, $path) {
+  $items['news'] = array(
+    'render element' => 'news',
+    'template'       => 'news',
+    'arguments'      => array('form' => NULL),
+    'path'           => drupal_get_path('module', 'news'),
+  );
+  return $items;
+}

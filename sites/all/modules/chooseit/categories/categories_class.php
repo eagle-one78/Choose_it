@@ -48,4 +48,17 @@ class Category {
     return $categories;
   }
 
+  /**
+   * Inserts categories to the database with the posted variables
+   * @param array $_POST
+   */
+  public function insert_category($post) {
+    db_insert('categories')
+      ->fields(array(
+        'name' => $post['category_name'],
+        'description' => $post['category_descrption'],
+      ))
+      ->execute();
+  }
+
 }

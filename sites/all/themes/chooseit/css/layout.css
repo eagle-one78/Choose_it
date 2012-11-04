@@ -3,8 +3,11 @@
 
 html,
 body,
-#page  {
+#page {
   height: 100%;
+}
+body ul {
+  list-style: none;
 }
 #page-wrapper {
   min-height: 100%;
