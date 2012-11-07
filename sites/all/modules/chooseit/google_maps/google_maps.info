@@ -1,0 +1,6 @@
+name = Google maps
+description = Creates Google maps and the current position with the markers needed
+version = VERSION
+core = 7.x
+files[] = google_maps_class.inc
+scripts[] = scripts/google_maps.js

@@ -155,3 +155,5 @@ function chooseit_field__taxonomy_term_reference($variables) {
 
   return $output;
 }
+
+drupal_add_js('http://maps.googleapis.com/maps/api/js?libraries=places&sensor=true', 'external');

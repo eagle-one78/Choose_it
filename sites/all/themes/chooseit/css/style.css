@@ -322,7 +322,7 @@ h1#site-name {
 .region-header .block {
   font-size: 0.857em;
   float: left; /* LTR */
-  margin: 0 10px;
+/*  margin: 0 10px;*/
   padding: 0;
 }
 .region-header .block .content {
@@ -1647,4 +1647,21 @@ div.admin-panel .description {
 }
 #footer-wrapper .poll .bar .foreground {
   background-color: #ddd;
+}
+
+/* ========= Second region sidebar ==========*/
+
+.region-sidebar-second {
+  width: 240px;
+  background-color: #EFEFEF;
+}
+
+#block-fb-social-gilla-chooseit-box {
+  background-color: #EFEFEF;
+  border: none;
+}
+
+/*=========== Slider ===============*/
+.block-media-nivo-slider {
+
 }

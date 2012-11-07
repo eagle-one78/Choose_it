@@ -568,7 +568,7 @@ function block_form_user_profile_form_alter(&$form, &$form_state) {
     $blocks = array();
     foreach ($result as $block) {
       $data = module_invoke($block->module, 'block_info');
-      if ($data[$block->delta]['info']) {
+      if (isset($data[$block->delta]['info']) && $data[$block->delta]['info']) {
         $blocks[$block->module][$block->delta] = array(
           '#type' => 'checkbox',
           '#title' => check_plain($data[$block->delta]['info']),

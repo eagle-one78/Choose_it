@@ -1,0 +1,73 @@
+<?php
+
+define('PERMISSION_VIEW_GOOGLE_MAPS', 'view Google maps');
+//define('PERMISSION_EDIT_GOOGLE_MAPS', 'edit Google maps');
+//define('PERMISSION_INSERT_GOOGLE_MAPS', 'insert Google maps');
+
+/**
+ * Implements hook_permission().
+ */
+function google_maps_permission() {
+  return array(
+    PERMISSION_VIEW_GOOGLE_MAPS => array(
+      'title' => t('View Google maps'),
+      'description' => t('View Google maps', array()),
+    ),
+//    PERMISSION_EDIT_GOOGLE_MAPS => array(
+//      'title' => t('Edit Google maps'),
+//      'description' => t('Editing Google maps', array()),
+//    ),
+//    PERMISSION_INSERT_GOOGLE_MAPS => array(
+//      'title' => t('Insert Google maps'),
+//      'description' => t('Insert Google maps', array()),
+//    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function google_maps_menu() {
+  $items = array();
+  $items['googlemaps'] = array(
+    'title' => 'Karta',
+    'page callback' => 'google_maps_callback',
+    'access arguments' => array('PERMISSION_VIEW_GOOGLE_MAPS'),
+  );
+//  $items['category/%'] = array(
+//    'title' => 'Redigera kategori',
+//    'description' => 'Redigera kategori',
+//    'page callback' => 'edit_category_callback',
+//    'access arguments' => array('edit category'),
+//  );
+//  $items['categories/%'] = array(
+//    'title' => 'Lägg till kategori',
+//    'page arguments' => array(1),
+//    'page callback' => 'insert_category_callback',
+//    'access arguments' => array(PERMISSION_INSERT_CATEGORY),
+//  );
+  return $items;
+}
+
+/**
+ * A hook to get the categories available
+ *
+ */
+
+function google_maps_callback() {
+  return theme('google_maps');
+}
+
+/**
+ * View the module theme for the google maps
+ * @return  array $items
+ */
+function google_maps_theme($existing, $type, $theme, $path) {
+  $items['google_maps'] = array(
+    'render element' => 'google_maps',
+    'template'       => 'google_maps',
+    'arguments'      => array('form' => NULL),
+    'path'           => drupal_get_path('module', 'google_maps'),
+  );
+  return $items;
+}
