@@ -242,6 +242,10 @@
       </div> <!-- /#footer -->
     <?php endif; ?>
 
-  </div></div> <!-- /.section, /#footer-wrapper -->
+  </div>
+    <div id="footer-text">
+      <?php print l(t('Privacy policy'), 'node/5'); ?> | <?php print t('Copyright Choose it! @year', array('@year' => date("Y"))); ?>
+    </div>
+  </div> <!-- /.section, /#footer-wrapper -->
 
 </div></div> <!-- /#page, /#page-wrapper -->
