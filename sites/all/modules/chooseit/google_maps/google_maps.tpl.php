@@ -1,1 +1,1 @@
-<div id="chooseit-map" style="width: 450px; min-height: 250px;"></div>
+<div id="chooseit-map" style="width: 350px; min-height: 500px;"></div>
