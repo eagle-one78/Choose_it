@@ -1,5 +1,6 @@
 name = Categories
-description = Gets the categories for the site
+description = Manages the categories for the site
 version = VERSION
 core = 7.x
-files[] = categories_class.php
+files[] = categories_class.inc
+files[] = categories.tpl.php

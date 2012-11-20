@@ -3,9 +3,9 @@
 * @file
  * A module to display the categories available
  */
-
+$categoryObject = NULL;
 define('PERMISSION_VIEW_CATEGORY', 'view category');
-//define('PERMISSION_EDIT_CATEGORY', 'edit category');
+define('PERMISSION_EDIT_CATEGORY', 'edit category');
 define('PERMISSION_INSERT_CATEGORY', 'insert category');
 
 /**
@@ -17,57 +17,15 @@ function categories_permission() {
       'title' => t('View the categories'),
       'description' => t('View the categories', array()),
     ),
-//    PERMISSION_EDIT_CATEGORY => array(
-//      'title' => t('Edit the categories'),
-//      'description' => t('Editing the categories', array()),
-//    ),
+    PERMISSION_EDIT_CATEGORY => array(
+      'title' => t('Edit the categories'),
+      'description' => t('Editing the categories', array()),
+    ),
     PERMISSION_INSERT_CATEGORY => array(
       'title' => t('Insert a categories'),
       'description' => t('Insert new category', array()),
     ),
   );
-}
-
-/**
- *
- *@return array $blocks
- */
-function categories_block_info() {
-  $blocks = array();
-  $blocks['insert-categories'] = array(
-    'info' => t('Lägg till kategori'),
-  );
-
-  return $blocks;
-}
-
-function categories_block_configure($delta='') {
-  $form = array();
-
-  switch($delta) {
-    case 'insert-categories' :
-      // Text field form element
-      $form['text_body'] = array(
-        '#type' => 'text_format',
-        '#title' => t('Lägg till kategori'),
-        '#default_value' => variable_get('text_variable', ''),
-      );
-
-      // File selection form element
-      $form['file'] = array(
-        '#name' => 'block_image',
-        '#type' => 'managed_file',
-        '#title' => t('Choose an Image File'),
-        '#description' => t('Select an Image for the custom block.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
-        '#default_value' => variable_get('block_image_fid', ''),
-        '#upload_location' => 'public://block_image/',
-        '#upload_validators' => array(
-          'file_validate_extensions' => array('gif png jpg jpeg'),
-        ),
-      );
-      break;
-  }
-  return $form;
 }
 
 /**
@@ -78,15 +36,15 @@ function categories_menu() {
   $items['categories'] = array(
     'title' => 'Visa kategorier',
     'page callback' => 'categories_callback',
-    'access arguments' => array('PERMISSION_VIEW_CATEGORY'),
+    'access arguments' => array(PERMISSION_VIEW_CATEGORY),
   );
-//  $items['category/%'] = array(
-//    'title' => 'Redigera kategori',
-//    'description' => 'Redigera kategori',
-//    'page callback' => 'edit_category_callback',
-//    'access arguments' => array('edit category'),
-//  );
-  $items['categories/%'] = array(
+  $items['category/edit'] = array(
+    'title' => 'Redigera kategori',
+    'page arguments' => array(1),
+    'page callback' => 'edit_category_callback',
+    'access arguments' => array(PERMISSION_EDIT_CATEGORY),
+  );
+  $items['categories/insert'] = array(
     'title' => 'Lägg till kategori',
     'page arguments' => array(1),
     'page callback' => 'insert_category_callback',
@@ -99,7 +57,6 @@ function categories_menu() {
  * A hook to get the categories available
  *
  */
-
 function categories_callback() {
   $categories = array();
   $categoryObject = new Category();
@@ -110,21 +67,72 @@ function categories_callback() {
 }
 
 /**
- *
- * @param type $catId
+ * @param     $_POST array
+ * @return    empty string
  */
-function edit_category_callback($catId) {
-
+function edit_category() {
+  if (isset($_POST['edit_category_id']) &&
+      isset($_POST['edit_category_name']) &&
+      isset($_POST['edit_category_description']) &&
+      isset($_POST['edit_category_type'])) {
+    $categoryObject = new Category();
+    if (isset($categoryObject)) {
+      $categoryObject->edit_category($_POST);
+//      drupal_goto('categories');
+    }
+    return '';
+  }
+  else {
+    drupal_set_message(t('Du måste ange namn och beskrivning!'), 'error');
+  }
 }
 
+/**
+ * @param     $_POST array
+ * @return    empty string
+ */
+function delete_category() {
+  if (isset($_POST['edit_category_id'])) {
+    $categoryObject = new Category();
+    if (isset($categoryObject)) {
+      $categoryObject->delete_category($_POST['edit_category_id']);
+//      drupal_goto('categories');
+    }
+    return '';
+  }
+  else {
+    drupal_set_message(t('Det gick inte att ta bort kategorin!'), 'error');
+  }
+}
+
+/**
+ * @return    category theme & edit category function call
+ */
+function edit_category_callback() {
+  $categoryEdit = array();
+  if (isset($_POST['edit_category'])) {
+    $categoryEdit['editCategory'] = edit_category();
+  }
+  if (isset($_POST['delete_category'])) {
+    $categoryEdit['deleteCategory'] = delete_category();
+  }
+  return theme('categories', $categoryEdit);
+}
+
+/**
+ * @param     $_POST array
+ * @return    empty string
+ */
 function insert_category() {
-  if (isset($_POST['insert_category']) &&
-    isset($_POST['category_name']) &&
-    isset($_POST['category_description'])) {
+  if (isset($_POST['category_name']) &&
+      isset($_POST['category_description']) &&
+      isset($_POST['category_type'])) {
     $categoryObject = new Category();
     if (isset($categoryObject)) {
       $categoryObject->insert_category($_POST);
+      drupal_goto('categories');
     }
+    return '';
   }
   else {
     drupal_set_message(t('Du måste ange namn och beskrivning!'), 'error');
