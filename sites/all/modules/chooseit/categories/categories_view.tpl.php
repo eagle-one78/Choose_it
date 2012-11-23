@@ -1,4 +1,11 @@
-<?php if(isset($categoriesInfo) && $categoriesInfo && user_access(PERMISSION_VIEW_CATEGORY)):
+<?php if(user_access(PERMISSION_INSERT_CATEGORY)): ?>
+<div class="insert-new-category">
+  <a class="insert-new-category-link" href="?q=categories/insert-categories">
+    Lägg till en ny kategori
+  </a>
+</div>
+<?php endif;
+if(isset($categoriesInfo) && $categoriesInfo && user_access(PERMISSION_VIEW_CATEGORY)):
   foreach ($categoriesInfo as $category): ?>
   <div class="categories-div">
     <input type="hidden" value="<?php echo $category->id ;?>" />
@@ -27,11 +34,3 @@
     </ul>
   </div>
   <?php endforeach; endif; ?>
-
-<?php if(user_access(PERMISSION_INSERT_CATEGORY)): ?>
-<div class="insert-new-category">
-  <a class="insert-new-category-link" href="?q=categories/insert-categories">
-    Lägg till en ny kategori
-  </a>
-</div>
-<?php endif; ?>

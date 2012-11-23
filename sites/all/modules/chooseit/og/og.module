@@ -78,20 +78,6 @@ define('OG_MEMBERSHIP_REQUEST_FIELD', 'og_membership_request');
  * Implements hook_help().
  */
 function og_help($path, $arg) {
-  // Provide messages for og-migrate module.
-  if ($path != 'admin/config/group/group-migrate'
-      && $path != 'batch' && strpos($path, '#') === FALSE
-      && user_access('access administration pages') && og_needs_migrate()) {
-
-    if (module_exists('og_migrate')) {
-      $message = t('Organic groups or one of its modules needs to <a href="@url">migrate data</a>. Organic groups may not work properly without it. After a successful execution you can disable it.', array('@url' => url('admin/config/group/group-migrate')));
-    }
-    else {
-      $message = t('Organic groups or one of its modules needs you to enable Organic groups migrate module.');
-    }
-    drupal_set_message($message, 'error');
-  }
-
   switch ($path) {
     case 'admin/help#og':
       $path = drupal_get_path('module', 'og');
@@ -349,7 +335,7 @@ function og_get_og_membership_properties($entity, array $options, $name, $type) 
   if ($gids = og_get_entity_groups($type, $entity, $state)) {
     $ids = array();
     foreach ($gids as $group_type => $values) {
-      $ids = $ids + array_keys($values);
+      $ids = array_merge($ids, array_keys($values));
     }
   }
 
@@ -1384,15 +1370,17 @@ function og_query_og_membership_alter(QueryAlterableInterface $query) {
     // If the table of the base entity does not exist (e.g. there is no
     // property condition), we need to add it, as we don't have the
     // revision ID and bundle in {og_membership} table.
+    $base_table = $entity_info['base table'];
     if (strpos($base_table_alias, 'field_data') === 0) {
       $id = $entity_info['entity keys']['id'];
-      $query->innerJoin($entity_type, $entity_type, "$entity_type.$id = ogm.etid");
+      $query->innerJoin($base_table, $base_table, "$base_table.$id = ogm.etid");
     }
 
-    $fields['revision_id']['table'] = $entity_type;
-    $fields['revision_id']['field'] = $entity_info['entity keys']['revision'];
+    $fields['revision_id']['table'] = $base_table;
+    // If there is no revision table, use the bundle.
+    $fields['revision_id']['field'] = !empty($entity_info['entity keys']['revision']) ? $entity_info['entity keys']['revision'] : $entity_info['entity keys']['bundle'];
 
-    $fields['bundle']['table'] = $entity_type;
+    $fields['bundle']['table'] = $base_table;
     $fields['bundle']['field'] = $entity_info['entity keys']['bundle'];
 
     $fields['entity_type']['table'] = 'ogm';
@@ -1646,7 +1634,7 @@ function og_check_field_cardinality($entity_type, $entity, $field_name) {
 /**
  * Set an association (e.g. subscribe) an entity to a group.
  *
-  @param $group_type
+ * @param $group_type
  *   The entity type of the group.
  * @param $gid
  *   The group entity or ID.
@@ -1666,6 +1654,7 @@ function og_check_field_cardinality($entity_type, $entity, $field_name) {
  *   The OG membership entity.
  */
 function og_group($group_type, $gid, $values = array()) {
+  global $user;
   // Set default values.
   $values += array(
     'entity_type' => 'user',
@@ -2342,7 +2331,7 @@ function og_roles($group_type, $bundle, $gid = 0, $force_group = FALSE, $include
 }
 
 /**
- * Get arary of default roles, keyed by their declaring module.
+ * Get array of default roles, keyed by their declaring module.
  *
  * @param $include
  *
@@ -3101,31 +3090,6 @@ function og_get_groups_by_user($account = NULL, $group_type = NULL) {
 }
 
 /**
- * Flag / unflag the node access grants for rebuilding, or read the current
- * value of the flag.
- *
- * When the flag is set, a message is displayed to users with 'access
- * administration pages' permission, pointing to the 'og-migrate' confirm form
- * in the og-migrate module.
- *
- * @param $migrate
- *   (Optional) The boolean value to be written.
-  * @return
- *   (If no value was provided for $migrate) The current value of the flag.
- */
-function og_needs_migrate($migrate = NULL) {
-  if (!isset($migrate)) {
-    return variable_get('og_needs_migrate', FALSE);
-  }
-  elseif ($migrate) {
-    variable_set('og_needs_migrate', TRUE);
-  }
-  else {
-    variable_del('og_needs_migrate');
-  }
-}
-
-/**
  * Implements hook_action_info().
  *
  * @see views_bulk_operations_action_info()
@@ -3201,6 +3165,17 @@ function og_features_api() {
 function og_migrate_api() {
   $api = array(
     'api' => 2,
+    'migrations' => array(
+      'OgMigrateAddFields' => array('class_name' => 'OgMigrateAddFields'),
+      'OgMigrateContent' => array('class_name' => 'OgMigrateContent'),
+      'OgMigrateUser' => array('class_name' => 'OgMigrateUser'),
+      'OgMigrateMembership' => array('class_name' => 'OgMigrateMembership'),
+      'OgMigrateRoles' => array('class_name' => 'OgMigrateRoles'),
+      'OgMigrateUserRoles' => array('class_name' => 'OgMigrateUserRoles'),
+    ),
+    'destination handlers' => array(
+      'MigrateDestinationOGMembership',
+    ),
   );
   return $api;
 }
