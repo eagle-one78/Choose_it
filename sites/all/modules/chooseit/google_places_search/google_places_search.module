@@ -1,0 +1,31 @@
+<?php
+
+function google_places_search_menu() {
+  $items = array();
+
+  $items['google_places_search'] = array(
+    'title' => 'Google places search',
+    'page callback' => 'google_places_search_callback',
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/*
+ * Display output
+ */
+
+function google_places_search_callback() {
+  return theme('google_places_search');
+}
+
+function google_places_search_theme($existing, $type, $theme, $path) {
+  $items['google_places_search'] = array(
+    'render element' => 'google_places_search',
+    'template' => 'google_places_search',
+    'arguments' => array('form' => NULL),
+    'path' => drupal_get_path('module', 'google_places_search'),
+  );
+  return $items;
+}

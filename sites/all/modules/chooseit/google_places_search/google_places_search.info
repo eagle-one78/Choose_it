@@ -1,0 +1,7 @@
+name = Google places search
+description = Search for places on Google map
+version = VERSION
+core = 7.x
+files[] = google_places_search.tpl.php
+stylesheets[all][] = google_places_search.css
+scripts[] = google_places_search.js

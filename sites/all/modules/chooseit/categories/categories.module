@@ -78,7 +78,8 @@ function edit_category() {
     $categoryObject = new Category();
     if (isset($categoryObject)) {
       $categoryObject->edit_category($_POST);
-//      drupal_goto('categories');
+      drupal_set_message(t('Kategorin uppdaterades'), 'status');
+      drupal_goto('categories');
     }
     return '';
   }
@@ -96,7 +97,8 @@ function delete_category() {
     $categoryObject = new Category();
     if (isset($categoryObject)) {
       $categoryObject->delete_category($_POST['edit_category_id']);
-//      drupal_goto('categories');
+      drupal_set_message(t('Kategorin togs bort'), 'status');
+      drupal_goto('categories');
     }
     return '';
   }
@@ -130,6 +132,7 @@ function insert_category() {
     $categoryObject = new Category();
     if (isset($categoryObject)) {
       $categoryObject->insert_category($_POST);
+      drupal_set_message(t('Kategorin är nu registrerad'), 'status');
       drupal_goto('categories');
     }
     return '';

@@ -1,0 +1,97 @@
+<?php
+/**
+ *@file places.install to create places table in the database
+ */
+
+
+/**
+ *Install function for the places module to create the schema (table: places) needed for the module
+ * @return      string
+ * @author     Sam Almendwi
+ */
+
+function places_schema() {
+  $schema['places'] = array(
+    'description' => 'Places table for the places module.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The primary identifier for a place.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'name' => array(
+        'description' => 'name of place.',
+        'type' => 'varchar',
+        'length' => 250,
+        'not null' => TRUE,
+        'default' => ''
+      ),
+      'formatted_address' => array(
+        'description' => 'address of place.',
+        'type' => 'text',
+        'length' => 500,
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'google_rating' => array(
+        'description' => 'Google rate of place.',
+        'type' => 'float',
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'chooseit_rating' => array(
+        'description' => 'Choose it rate of place.',
+        'type' => 'float',
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'rating_count' => array(
+        'description' => 'Count of rates for place.',
+        'type' => 'int',
+        'length' => 11,
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'rating_user_id' => array(
+        'description' => 'user id of rate for place.',
+        'type' => 'int',
+        'length' => 11,
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'website' => array(
+        'description' => 'website for place.',
+        'type' => 'text',
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'phone_number' => array(
+        'description' => 'Phone number for place.',
+        'type' => 'varchar',
+        'length' => '55',
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+      'place_comment' => array(
+        'description' => 'Comment for place.',
+        'type' => 'text',
+        'not null' => FALSE,
+        'default' => NULL
+      ),
+    ),
+    'indexes' => array(
+      'id' => array(
+        'id'
+      ),
+    ),
+    'unique keys' => array(
+      'id' => array('id'),
+    ),
+    'primary key' => array(
+      'id'
+    ),
+  );
+
+  return $schema;
+}

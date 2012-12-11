@@ -193,23 +193,14 @@
 <!--        </h1>-->
       <?php // endif; ?>
       <?php
-        if(arg(0) == 'node' && !arg(1)) {
-          $category = new Category();
-          $allCats = $category->get_all_categories_from_DB();
-          foreach ($allCats as $value) {
-            echo '<div class="categories-names-main">
-                    <ul class="categories-names-list" style="list_styel_type: none;">
-                      <li class="categories-names-list-item">
-                        <div class="category-names-item-div">
-                          <h2>' . $value->name . '</h2>
-                          <p>' . $value->description . '</p>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>';
-          }
-        }
-      ?>
+        if(arg(0) == 'node' && !arg(1)): ?>
+          <div class="clear-div">
+            <h2 class="map-h2">Sök efter vad du vill och var och ge ditt omdöme</h2>
+            <input class="search-input" type="text" id="search" placeholder="Sök vad du önskar & var!"/>
+            <a href="" class="clear-map">Rensa kartan</a>
+          </div>
+          <div id="map_canvas"></div>
+        <?php endif; ?>
       <?php print render($title_suffix); ?>
       <?php if ($tabs): ?>
         <div class="tabs">

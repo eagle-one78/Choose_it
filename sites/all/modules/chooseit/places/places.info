@@ -1,0 +1,13 @@
+name = Places
+description = Manages the Places
+version = VERSION
+core = 7.x
+files[] = places_class.inc
+files[] = places.tpl.php
+stylesheets[all][] = css/fivestar.css
+stylesheets[all][] = css/fivestar-rtl.css
+stylesheets[all][] = css/craft-rtl.css
+stylesheets[all][] = css/craft.css
+scripts[] = scripts/jquery.pagination.js
+scripts[] = scripts/places.js
+

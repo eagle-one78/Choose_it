@@ -1,0 +1,322 @@
+<?php
+
+/**
+ * @file
+ * A module to display, insert, and edit the places available
+ * And manages the rating functionality
+ */
+$placeObject = NULL;
+define ('PERMISSION_VIEW_PLACE', 'view place');
+define ('PERMISSION_EDIT_PLACE', 'edit place');
+define ('PERMISSION_INSERT_PLACE', 'insert place');
+
+/**
+ * Implements hook_permission().
+ */
+function places_permission() {
+  return array(
+    PERMISSION_VIEW_PLACE => array(
+      'title' => t('View the places'),
+      'description' => t('View the places', array()),
+    ),
+    PERMISSION_EDIT_PLACE => array(
+      'title' => t('Edit the places'),
+      'description' => t('Editing the places', array()),
+    ),
+    PERMISSION_INSERT_PLACE => array(
+      'title' => t('Insert a places'),
+      'description' => t('Insert new place', array()),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function places_menu() {
+  $items = array();
+  $items['places'] = array(
+    'title' => 'Visa platser',
+    'page callback' => 'places_callback',
+    'access arguments' => array(PERMISSION_VIEW_PLACE),
+  );
+  $items['place/edit'] = array(
+    'title' => 'Redigera plats',
+    'page arguments' => array(1),
+    'page callback' => 'edit_place_callback',
+    'access arguments' => array(PERMISSION_EDIT_PLACE),
+  );
+  $items['places/insert'] = array(
+    'title' => 'Lägg till plats',
+    'page arguments' => array(1),
+    'page callback' => 'insert_place_callback',
+    'access arguments' => array(PERMISSION_INSERT_PLACE),
+  );
+  $items['places/rating'] = array(
+    'title' => 'Ge omdöme sida',
+    'page arguments' => array(1),
+    'page callback' => 'place_rating_callback',
+    'access arguments' => array(PERMISSION_VIEW_PLACE),
+  );
+  $items['places/rating/ajax'] = array(
+    'title' => 'Spara omdöme sida',
+    'page arguments' => array(1),
+    'page callback' => 'insert_place_rating_callback',
+    'access arguments' => array(PERMISSION_VIEW_PLACE),
+  );
+  $items['places/insert/ajax'] = array(
+    'title' => 'Lägg till plats',
+    'page arguments' => array(1),
+    'page callback' => 'insert_place_ajax_callback',
+    'access arguments' => array(PERMISSION_VIEW_PLACE),
+  );
+  return $items;
+}
+
+/**
+ * A hook to get the places available
+ *
+ */
+function places_callback() {
+  $places = array();
+  $placeObject = new Place();
+  if (isset($placeObject)) {
+    $places['placesInfo'] = $placeObject->get_all_places_from_DB();
+  }
+  return theme('places', $places);
+}
+
+/**
+ * @param    $_POST array
+ * @return    empty string
+ */
+function edit_place() {
+  if (isset($_POST['edit_place_id']) &&
+    isset($_POST['edit_place_name']) &&
+    isset($_POST['edit_formatted_address'])) {
+    $placeObject = new Place();
+    if (isset($placeObject)) {
+      $placeObject->edit_place($_POST);
+      drupal_set_message(t('Platsen uppdaterades'), 'status');
+      drupal_goto('places');
+    }
+    return '';
+  }
+  else {
+    drupal_set_message(t('Du måste ange namn och adress!'), 'error');
+    drupal_goto('places/?q=edit_places/' . $_POST['edit_place_id']);
+  }
+}
+
+/**
+ * process the deletion of a place from the manuall deletion,
+ * @param   $_POST array
+ * @return   Theme
+ */
+function delete_place() {
+  if (isset ($_POST['edit_place_id'])) {
+    $placeObject = new Place();
+    if (isset ($placeObject)) {
+      $placeObject->delete_place($_POST['edit_place_id']);
+      drupal_set_message(t('Platsen togs bort!'), 'status');
+      drupal_goto('places');
+    }
+    return theme('places');
+  }
+  else {
+    drupal_set_message(t('Det gick inte att ta bort platsen!'), 'error');
+    drupal_goto('places/?q=edit_places/' . $_POST['edit_place_id']);
+  }
+}
+
+/**
+ * process the edit of a place from the manuall edit,
+ * process the $_POST array, escape and sanitize it before send to the place class for edit
+ * @param     $_POST array
+ * @return    place theme & edit place function call
+ */
+function edit_place_callback() {
+  $placeEdit = array();
+  if (isset ($_POST['edit_place'])) {
+    $placeEdit['editPlace'] = edit_place();
+  }
+  if (isset ($_POST['delete_place'])) {
+    $placeEdit['deletePlace'] = delete_place();
+  }
+  return theme('places', $placeEdit);
+}
+
+/**
+ * process the insertion of a place from the manuall insertion,
+ * process the $_POST array, escape and sanitize it before send to the place class for insertion
+ * @param     $_POST array
+ * @return    empty string
+ */
+function insert_place() {
+  if (isset($_POST['place_name']) &&
+    isset($_POST['formatted_address'])) {
+    $placeObject = new Place();
+    if (isset($placeObject)) {
+      $placeObject->insert_place (mysql_real_escape_string($_POST));
+      drupal_set_message(t('Platsen är nu registrerad'), 'status');
+      drupal_goto('places');
+    }
+    return '';
+  }
+  else {
+    drupal_set_message(t('Du måste minst ange namn och adress!'), 'error');
+  }
+}
+
+/**
+ *Insert place callback function for manuall insertion from the Choose it insert place page
+ * @return array $placeInsert & theme
+ */
+function insert_place_callback() {
+  $placeInsert = array();
+  if (isset ($_POST['insert_place'])) {
+    $placeInsert['insertPlace'] = insert_place();
+  }
+
+  return theme('places', $placeInsert);
+}
+
+/**
+ * place insertion function that process the $_POST, escape and sanitize the array before sed it to the place class
+ * for insertion
+ * @param     $_POST array
+ * @return    empty string
+ */
+function insert_place_ajax() {
+  $post = array();
+  if (isset($_POST['place_name'])) {
+    $post['place_name'] = mysql_real_escape_string($_POST['place_name']);
+  }
+  if (isset($_POST['formatted_address'])) {
+    $post['formatted_address'] = mysql_real_escape_string($_POST['formatted_address']);
+  }
+  if (isset($_POST['google_rating'])) {
+    $post['google_rating'] = mysql_real_escape_string($_POST['google_rating']);
+  }
+  if (isset($_POST['chooseit_rating'])) {
+    $post['chooseit_rating'] = mysql_real_escape_string($_POST['chooseit_rating']);
+  }
+  if (isset($_POST['website'])) {
+    $post['website'] = mysql_real_escape_string($_POST['website']);
+  }
+  if (isset($_POST['phone_number'])) {
+    $post['phone_number'] = mysql_real_escape_string($_POST['phone_number']);
+  }
+
+  if (isset($_POST['insert_place']) &&
+    isset($_POST['place_name']) &&
+    isset($_POST['formatted_address'])) {
+    $placeObject = new Place();
+    if (isset($placeObject)) {
+      $placeObject->insert_place_ajax($post);
+    }
+    return '';
+  }
+  else {
+    echo 'place_insert_faild';
+    drupal_set_message(t('Du måste minst ange namn och adress!'), 'error');
+  }
+}
+
+/**
+ *process the insertion of the place with the help of AJAX from the application
+ * @return array $placeInsert with the theme
+ */
+function insert_place_ajax_callback() {
+  $placeInsert = array();
+  if (isset ($_POST['insert_place'])) {
+    $placeInsert['insertPlace'] = insert_place_ajax();
+  }
+
+  return theme('places', $placeInsert);
+}
+
+/**
+ * Get the place for rating
+ * the function gets the $_GET from the Google maps link click and gets the place required from
+ * the database, proccess the params, show them and preform the rating insert
+ */
+function place_rating_callback() {
+  $placeObject = new Place();
+  $escapedName = '';
+  $escapedAddress = '';
+  $placeToRate = '';
+
+  if (isset ($_GET)) {
+    if (isset ($_GET['name'])) {
+      $escapedName = mysql_real_escape_string($_GET['name']);
+    }
+    if (isset ($_GET['address'])) {
+      $escapedAddress = mysql_real_escape_string($_GET['address']);
+    }
+
+    if (isset ($placeObject)) {
+      $placeToRate['placeParams'] = $placeObject->get_places_from_DB_by($escapedName, $escapedAddress);
+      $rateLevel = $placeToRate['placeParams']['chooseit_rating'];
+      $rateCount = $placeToRate['placeParams']['rating_count'];
+      if (isset($rateLevel) && isset($rateCount)) {
+        $rateMaxLevel = $rateLevel / $rateCount;
+        $placeToRate['placeParams']['rateAverage'] = $rateMaxLevel / 20;
+      }
+    }
+    return theme('places', $placeToRate);
+  }
+}
+
+/**
+ *Insert rating depending on the uer click and on which star, 0 if cancel
+ * returns json_encode arrays
+ */
+function insert_place_rating_callback() {
+  $post = array();
+
+  if (isset($_POST['place_id'])) {
+    $post['place_id'] = mysql_real_escape_string($_POST['place_id']);
+  }
+  if (isset($_POST['chooseit_rate'])) {
+    $post['chooseit_rate'] = mysql_real_escape_string($_POST['chooseit_rate']);
+  }
+  if (isset ($post['place_id']) && isset($post['chooseit_rate']) && isset($_POST['rating'])) {
+
+    $post['rating'] = mysql_real_escape_string($_POST['rating']);
+    $placeObject = new Place();
+    if (isset($placeObject)) {
+      $insertResponse = $placeObject->insert_place_rate($post);
+      $placeRating = $placeObject->get_place_average_rate($post['place_id']);
+
+      if (isset($insertResponse) && $insertResponse == 'user_rate_exists') {
+        echo json_encode(array('error' => TRUE, 'data' => 'Du har redan röstat på denna plats!'));
+      }
+      elseif (isset($insertResponse) && $insertResponse == 'guest_user') {
+        echo json_encode(array('error' => TRUE, 'data' => 'Du måste vara inloggad för att kunna ge omdöme!'));
+      }
+      elseif (isset($insertResponse) && $insertResponse == 'success') {
+        echo json_encode(array('success' => TRUE, 'data' => $placeRating));
+      }
+    }
+  }
+  else {
+    echo json_encode('rating_insert_faild');
+  }
+
+}
+
+
+/**
+ * View the module theme for the places
+ * @return  array $items
+ */
+function places_theme($existing, $type, $theme, $path) {
+  $items['places'] = array(
+    'render element' => 'places',
+    'template' => 'places',
+    'arguments' => array('form' => NULL),
+    'path' => drupal_get_path('module', 'places'),
+  );
+  return $items;
+}

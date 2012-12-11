@@ -8,6 +8,7 @@
 if(isset($categoriesInfo) && $categoriesInfo && user_access(PERMISSION_VIEW_CATEGORY)):
   foreach ($categoriesInfo as $category): ?>
   <div class="categories-div">
+    <div class="ajax-message"></div>
     <input type="hidden" value="<?php echo $category->id ;?>" />
     <ul class="category-list">
       <li class="category-list-item">

@@ -1,0 +1,41 @@
+/*
+    Document   : google_places_search
+    Created on : 2012-nov-25
+    Author     : Sam Almendwi
+    Description:
+        Styling the Google places module for Choose it!
+*/
+
+html{
+  height: 100%;
+}
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.clear-div {
+  clear: both;
+  width: 952px;
+}
+.search-input {
+  width: 100%;
+  border: 2px solid beige;
+  clear: both;
+}
+#map_canvas{
+  width: 960px;
+  height: 400px;
+  clear: both;
+  margin: 5px auto;
+  border: 3px solid beige;
+}
+input::-webkit-input-placeholder {
+    color: #B1731F;
+}
+input:-moz-placeholder {
+    color: #B1731F;
+}
+input:-ms-input-placeholder {
+    color: #B1731F;
+}
