@@ -37,6 +37,21 @@ class Place {
     return $placesById;
   }
 
+/**
+ *Get place all params from DB according to the supplied ID
+ * @param int $placeId
+ * @return array
+ */
+  public function get_place_params_from_DB_by($placeId) {
+    $query = db_select('places', 'pl')
+      ->fields('pl')
+      ->condition('pl.id', $placeId, '=')
+      ->orderBy('name')
+      ->execute();
+    $placesById = $query->fetchAll();
+    return $placesById;
+  }
+
   /**
    *
    * @param type $name
@@ -186,8 +201,11 @@ class Place {
    */
   public function insert_place_rate($post) {
     $placeId = '0';
-    $rating_count = 0;
-    $userIdOnDb = '0';
+    $userIdOnDb = '';
+    $usersIdOnDb = array();
+    $IdOnDb = array();
+    $currentRate = '';
+    $currentRatingCount = '';
     global $user;
     $process = FALSE;
     $userId = '0';
@@ -200,44 +218,64 @@ class Place {
 
     //Create a self instance of the class
     $placesObject = new Place();
-    //Get all places from the daabase
-    $places = $placesObject->get_all_places_from_DB();
+    //Get all places from the database
+    $places = $placesObject->get_place_params_from_DB_by($post['place_id']);
 
     /*
      * Loop throw the places and check if the posted data match with any existing place and return TRUE to exit
      * else procced to save the new place to data base
      */
-    foreach ($places as $key => $value) {
+    foreach ($places as $value) {
       $placeId = $value->id;
       $userIdOnDb = $value->rating_user_id;
+      $usersIdOnDb = explode(',', $userIdOnDb);
+      $currentRatingCount = $value->rating_count;
+      foreach ($usersIdOnDb as $id) {
+        $IdOnDb[] = $id;
+      }
 
-      if ($placeId == $post['place_id'] && $userId == $userIdOnDb && $post['chooseit_rate'] != '0') {
+      /*Validate if the place is the same at the db and the one rated, the user already rated the place, and if the rate is'nt 0
+       * return string to AJAX
+       * and the failure process boolean variable sets to TRUE
+      */
+      if ($placeId == $post['place_id'] && in_array($userId, $IdOnDb)  && $post['chooseit_rate'] != '0') {
         $rateExists = 'user_rate_exists';
         $process = TRUE;
         return $rateExists;
       }
+      //Validate if the user is a guest user and return string to the AJAX
       if ($placeId == $post['place_id'] && $userId == '0' && $post['chooseit_rate'] != '0') {
         $guestUser = 'guest_user';
         $process = TRUE;
         return $guestUser;
       }
     }
+    /**
+     * If validation is ok process the rate insertion to DB with some math to get the statistics on the right step and return string success to AJAX
+     */
     if ($process == FALSE) {
+      $currentRate = $places[0]->chooseit_rating;
+      $newRate = $currentRate + $post['chooseit_rate'];
+      $currentRatingCount = $currentRatingCount + 1;
+      $newUserId = $userIdOnDb . ', ' . $userId;
       db_update('places')
         ->fields(array(
-          'chooseit_rating' => $post['chooseit_rate'],
-          'rating_user_id' => $userId,
-          'rating_count' => $rating_count + 1
+          'chooseit_rating' =>  $newRate,
+          'rating_user_id' => $newUserId,
+          'rating_count' => $currentRatingCount
         ))
         ->condition('id', $post['place_id'], '=')
         ->execute();
      $success = 'success';
      return $success;
     }
+    //Else if all above not work return FALSE and abort
     elseif ($process == TRUE) {
       return FALSE;
     }
   }
+
+
 /**
  *Gets the rating params from the database and process the maths to get the average rating for the place
  * @param int $id

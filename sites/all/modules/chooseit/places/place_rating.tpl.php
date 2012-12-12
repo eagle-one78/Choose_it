@@ -1,3 +1,11 @@
+<?php
+/**
+ *Main rating template for the place required after klickeing the link 'rate' from the main map page or from places page
+ * It checks if the place params array isset then process the markup to present on screen and submit the rates to the server for process using AJAX
+ */
+?>
+
+
 <?php if (isset ($placeParams)): ?>
   <label class="rating-div2-label" for="place-rating-div2"><h1>Choose it! omdöme</h1></label>
   <div class="place-rating-div2">

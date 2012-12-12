@@ -1,5 +1,12 @@
 /*
- *
+ *Main places script file.
+ *Processing:
+ *  -PLaces pagination
+ *  -Markup control for the places page for showing the info on events
+ *  -AJAX for rating on the place shown.
+ *  @author:    Sam Almendwi
+ *  @version:   1.0
+ *  @created:   20012-11-15
  */
 
 (function($) {
@@ -43,13 +50,13 @@
         data: data,
         success: function(data) {
           if(data.data !== 'Du har redan röstat på denna plats!' && data.data !== 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.place-rating-c-rating').html(data.data).fadeIn(2000);
+            $('.place-rating-c-rating').html(data.data).fadeIn(5000);
           }
           if (data.error === true && data.data === 'Du har redan röstat på denna plats!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
           if (data.error === true && data.data === 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
         }
       });
@@ -68,13 +75,13 @@
         data: data,
        success: function(data) {
           if(data.data !== 'Du har redan röstat på denna plats!' && data.data !== 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.place-rating-c-rating').html(data.data).fadeIn(2000);
+            $('.place-rating-c-rating').html(data.data).fadeIn(5000);
           }
           if (data.error === true && data.data === 'Du har redan röstat på denna plats!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
           if (data.error === true && data.data === 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
         }
       });
@@ -93,13 +100,13 @@
         data: data,
         success: function(data) {
           if(data.data !== 'Du har redan röstat på denna plats!' && data.data !== 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.place-rating-c-rating').html(data.data).fadeIn(2000);
+            $('.place-rating-c-rating').html(data.data).fadeIn(5000);
           }
           if (data.error === true && data.data === 'Du har redan röstat på denna plats!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
           if (data.error === true && data.data === 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
         }
       });
@@ -118,13 +125,13 @@
         data: data,
         success: function(data) {
           if(data.data !== 'Du har redan röstat på denna plats!' && data.data !== 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.place-rating-c-rating').html(data.data).fadeIn(2000);
+            $('.place-rating-c-rating').html(data.data).fadeIn(5000);
           }
           if (data.error === true && data.data === 'Du har redan röstat på denna plats!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
           if (data.error === true && data.data === 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
         }
       });
@@ -144,13 +151,13 @@
         dataType: 'json',
         success: function(data) {
           if(data.data !== 'Du har redan röstat på denna plats!' && data.data !== 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.place-rating-c-rating').html(data.data).fadeIn(2000);
+            $('.place-rating-c-rating').html(data.data).fadeIn(5000);
           }
           if (data.error === true && data.data === 'Du har redan röstat på denna plats!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
           if (data.error === true && data.data === 'Du måste vara inloggad för att kunna ge omdöme!') {
-            $('.ajax-message').show().html(data.data).fadeOut(5000);
+            $('.ajax-message').show().html(data.data).fadeOut(7000);
           }
         }
       });
